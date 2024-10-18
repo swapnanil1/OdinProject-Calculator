@@ -12,70 +12,75 @@ clear.addEventListener("click", () => {
     display.textContent = "";
     dhistory.textContent = "History: ";
 });
-const output = document.querySelector(".output");
-output.addEventListener("click", () => {
-    secondN = parseFloat(display.textContent);
-    dhistory.textContent += `= ${operate(ops, firstN, secondN)} , `;
-    firstN = operate(ops, firstN, secondN);
-    display.textContent = "";
-    secondN = undefined;
-});
-// i have to calcuate the output every time operator is pressed
+
 const numbers = document.querySelectorAll(".nums");
 numbers.forEach((e) => {
     e.addEventListener("click", () => {
-        display.textContent += e.textContent;
-        dhistory.textContent += e.textContent;
-        // if (secondN === undefined){
-        //     secondN = display.textContent;
-        // }
+        // Prevent multiple decimal points
+        if (!(e.textContent === "." && display.textContent.includes("."))) {
+            display.textContent += e.textContent;
+            dhistory.textContent += e.textContent;
+        }
     });
+});
+
+const output = document.querySelector(".output");
+output.addEventListener("click", () => {
+    if (display.textContent !== "") {
+        secondN = parseFloat(display.textContent);
+        if (firstN !== undefined && secondN !== undefined && ops) {
+            firstN = operate(ops, firstN, secondN);
+            display.textContent = firstN;
+            dhistory.textContent += ` = ${firstN} `;
+            ops = undefined;
+            secondN = undefined;
+        } else if (firstN === undefined) {
+            firstN = secondN;
+        }
+    }
 });
 
 const operator = document.querySelectorAll(".operator");
 operator.forEach((e) => {
     e.addEventListener("click", () => {
-        ops = e.textContent;
-        dhistory.textContent += e.textContent;
-
-        secondN = parseFloat(display.textContent);
-        if (firstN !== undefined && secondN !== undefined) {
-            display.textContent = parseFloat(operate(ops, firstN, secondN));
+        if (display.textContent !== "") {
+            secondN = parseFloat(display.textContent);
+            if (firstN !== undefined && secondN !== undefined) {
+                if (ops) {
+                    firstN = operate(ops, firstN, secondN);
+                } else {
+                    firstN = secondN;
+                }
+                display.textContent = firstN;
+                dhistory.textContent += ` ${e.textContent} `;
+            } else {
+                firstN = secondN;
+                dhistory.textContent += ` ${e.textContent} `;
+            }
+            ops = e.textContent;
+            display.textContent = "";
         }
-
-        firstN = parseFloat(display.textContent);
-        history.textContent = display.textContent;
-        display.textContent = "";
     });
 });
 
+
 function operate(ops, firstN, secondN) {
-    display.textContent = "";
-    const add = function (n1, n2) {
-        return n1 + n2;
-    };
+    const add = (n1, n2) => n1 + n2;
+    const subtract = (n1, n2) => n1 - n2;
+    const multiply = (n1, n2) => n1 * n2;
+    const divide = (n1, n2) => n2 !== 0 ? n1 / n2 : "Cannot divide by zero";
 
-    const subtract = function (n1, n2) {
-        return n1 - n2;
-    };
-
-    const multiply = function (n1, n2) {
-        return n1 * n2;
-    };
-
-    const divide = function (n1, n2) {
-        return n1 / n2;
-    };
-    if (ops === "+") {
-        result = add(firstN, secondN);
-    } else if (ops === "-") {
-        result = subtract(firstN, secondN);
-    } else if (ops === "X") {
-        result = multiply(firstN, secondN);
-    } else if (ops === "/") {
-        result = divide(firstN, secondN);
-    } else {
-        result = "Error";
+    switch (ops) {
+        case "+":
+            return add(firstN, secondN);
+        case "-":
+            return subtract(firstN, secondN);
+        case "X":
+            return multiply(firstN, secondN);
+        case "/":
+            return divide(firstN, secondN);
+        default:
+            return "Error";
     }
-    return result;
 }
+
