@@ -1,86 +1,86 @@
-let firstN = undefined;
-let secondN = undefined;
-let ops = undefined;
-const display = document.querySelector("#display");
-const dhistory = document.querySelector(".mainboard .dhistory");
+let firstOperand = null;
+let secondOperand = null;
+let currentOperator = null;
+const displayElement = document.querySelector("#calculator-display");
+const historyElement = document.querySelector(".calculator-main-board .calculator-history");
 
-const clear = document.querySelector(".clear");
-clear.addEventListener("click", () => {
-    display.textContent = "";
-    firstN = undefined;
-    secondN = undefined;
-    display.textContent = "";
-    dhistory.textContent = "History: ";
+const clearButton = document.querySelector(".clear-button");
+clearButton.addEventListener("click", clearCalculator);
+
+const numberButtons = document.querySelectorAll(".number-button button");
+numberButtons.forEach((button) => {
+    button.addEventListener("click", () => appendNumber(button.textContent));
 });
 
-const numbers = document.querySelectorAll(".nums");
-numbers.forEach((e) => {
-    e.addEventListener("click", () => {
-        // Prevent multiple decimal points
-        if (!(e.textContent === "." && display.textContent.includes("."))) {
-            display.textContent += e.textContent;
-            dhistory.textContent += e.textContent;
-        }
-    });
+const equalsButton = document.querySelector(".equals-button button");
+equalsButton.addEventListener("click", calculateResult);
+
+const operatorButtons = document.querySelectorAll(".operator-button button");
+operatorButtons.forEach((button) => {
+    button.addEventListener("click", () => setOperator(button.textContent));
 });
 
-const output = document.querySelector(".output");
-output.addEventListener("click", () => {
-    if (display.textContent !== "") {
-        secondN = parseFloat(display.textContent);
-        if (firstN !== undefined && secondN !== undefined && ops) {
-            firstN = operate(ops, firstN, secondN);
-            display.textContent = firstN;
-            dhistory.textContent += ` = ${firstN} `;
-            ops = undefined;
-            secondN = undefined;
-        } else if (firstN === undefined) {
-            firstN = secondN;
-        }
-    }
-});
+function clearCalculator() {
+    displayElement.textContent = "";
+    firstOperand = null;
+    secondOperand = null;
+    currentOperator = null;
+    historyElement.textContent = "History: ";
+}
 
-const operator = document.querySelectorAll(".operator");
-operator.forEach((e) => {
-    e.addEventListener("click", () => {
-        if (display.textContent !== "") {
-            secondN = parseFloat(display.textContent);
-            if (firstN !== undefined && secondN !== undefined) {
-                if (ops) {
-                    firstN = operate(ops, firstN, secondN);
-                } else {
-                    firstN = secondN;
-                }
-                display.textContent = firstN;
-                dhistory.textContent += ` ${e.textContent} `;
-            } else {
-                firstN = secondN;
-                dhistory.textContent += ` ${e.textContent} `;
-            }
-            ops = e.textContent;
-            display.textContent = "";
-        }
-    });
-});
-
-
-function operate(ops, firstN, secondN) {
-    const add = (n1, n2) => n1 + n2;
-    const subtract = (n1, n2) => n1 - n2;
-    const multiply = (n1, n2) => n1 * n2;
-    const divide = (n1, n2) => n2 !== 0 ? n1 / n2 : "Cannot divide by zero";
-
-    switch (ops) {
-        case "+":
-            return add(firstN, secondN);
-        case "-":
-            return subtract(firstN, secondN);
-        case "X":
-            return multiply(firstN, secondN);
-        case "/":
-            return divide(firstN, secondN);
-        default:
-            return "Error";
+function appendNumber(number) {
+    if (!(number === "." && displayElement.textContent.includes("."))) {
+        displayElement.textContent += number;
+        historyElement.textContent += number;
     }
 }
 
+function calculateResult() {
+    if (displayElement.textContent !== "") {
+        secondOperand = parseFloat(displayElement.textContent);
+        if (firstOperand !== null && currentOperator) {
+            firstOperand = performOperation(currentOperator, firstOperand, secondOperand);
+            displayElement.textContent = firstOperand;
+            historyElement.textContent += ` = ${firstOperand} `;
+            currentOperator = null;
+            secondOperand = null;
+        } else {
+            firstOperand = secondOperand;
+        }
+    }
+}
+
+function setOperator(operator) {
+    if (displayElement.textContent !== "") {
+        secondOperand = parseFloat(displayElement.textContent);
+        if (firstOperand === null) {
+            firstOperand = secondOperand;
+        } else if (currentOperator) {
+            firstOperand = performOperation(currentOperator, firstOperand, secondOperand);
+        }
+        currentOperator = operator;
+        historyElement.textContent += ` ${currentOperator} `;
+        displayElement.textContent = "";
+    }
+}
+
+function performOperation(operator, operand1, operand2) {
+    let result;
+    switch (operator) {
+        case "+":
+            result = operand1 + operand2;
+            break;
+        case "-":
+            result = operand1 - operand2;
+            break;
+        case "X":
+            result = operand1 * operand2;
+            break;
+        case "/":
+            result = operand2 !== 0 ? operand1 / operand2 : "Cannot divide by zero";
+            break;
+        default:
+            return null;
+    }
+    return typeof result === "number" ? parseFloat(result.toFixed(2)) : result;
+}
