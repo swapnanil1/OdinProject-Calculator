@@ -1,10 +1,9 @@
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #241d33;
-    padding: 2rem;
-    margin: 0;
+    background-color: #131313;
 }
 
 #calculator-container {
@@ -14,7 +13,7 @@ body {
     width: 32rem;
     padding-top: 1rem;
     padding-bottom: 1rem;
-    background-color: #302244;
+    background-color: #313131;
     border: 0.5rem solid transparent;
     border-image: linear-gradient(to bottom right, #b827fc, #2c90fc, #b8fd33, #fec837, #fd1892);
     border-image-slice: 1;
@@ -55,7 +54,7 @@ button {
     border: 2px solid black;
     font-size: 2rem;
     background-color: lightsteelblue;
-    box-shadow: 0 5px #666;
+    box-shadow: 0 .25rem #313131;
     transition: background-color 0.3s, transform 0.2s;
 }
 
@@ -84,4 +83,14 @@ button:hover {
     flex: 1;
     height: 100%;
     font-size: 3rem;
+}
+footer {
+    display: flex;
+    justify-content: center;
+    padding: 5px;
+    color: white;
+}
+footer p {
+    display: flex;
+    flex: 1;
 }
